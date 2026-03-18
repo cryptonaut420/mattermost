@@ -25,6 +25,13 @@ log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Detect docker compose command (v2 plugin vs v1 standalone)
+if docker compose version &>/dev/null; then
+    COMPOSE_CMD="docker compose"
+else
+    COMPOSE_CMD="docker-compose"
+fi
+
 # ===========================================
 # Setup directories and permissions
 # ===========================================
@@ -53,7 +60,7 @@ deploy_local() {
     
     setup_dirs
     
-    docker compose -f docker-compose.yml -f docker-compose.without-nginx.yml up -d
+    $COMPOSE_CMD -f docker-compose.yml -f docker-compose.without-nginx.yml up -d
     
     log_info "Mattermost is starting..."
     log_info "Access at: http://localhost:8065"
@@ -84,7 +91,7 @@ deploy_server() {
     
     setup_dirs
     
-    docker compose -f docker-compose.yml -f docker-compose.nginx-proxy.yml up -d
+    $COMPOSE_CMD -f docker-compose.yml -f docker-compose.nginx-proxy.yml up -d
     
     log_info "Mattermost is starting..."
     log_info "Access at: https://${DOMAIN}"
@@ -100,8 +107,8 @@ shutdown() {
     log_info "Shutting down Mattermost..."
     
     # Try both compose file combinations
-    docker compose -f docker-compose.yml -f docker-compose.without-nginx.yml down 2>/dev/null || true
-    docker compose -f docker-compose.yml -f docker-compose.nginx-proxy.yml down 2>/dev/null || true
+    $COMPOSE_CMD -f docker-compose.yml -f docker-compose.without-nginx.yml down 2>/dev/null || true
+    $COMPOSE_CMD -f docker-compose.yml -f docker-compose.nginx-proxy.yml down 2>/dev/null || true
     
     log_info "Mattermost stopped."
 }
@@ -110,7 +117,7 @@ shutdown() {
 # View logs
 # ===========================================
 view_logs() {
-    docker compose logs -f mattermost
+    $COMPOSE_CMD logs -f mattermost
 }
 
 # ===========================================
@@ -119,10 +126,10 @@ view_logs() {
 check_status() {
     echo ""
     log_info "Container Status:"
-    docker compose ps
+    $COMPOSE_CMD ps
     echo ""
     log_info "Recent Logs:"
-    docker compose logs --tail=20 mattermost
+    $COMPOSE_CMD logs --tail=20 mattermost
 }
 
 # ===========================================
