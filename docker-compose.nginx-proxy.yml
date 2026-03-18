@@ -1,0 +1,26 @@
+# docker-compose override for nginx-proxy deployments
+# Use with: docker compose -f docker-compose.yml -f docker-compose.nginx-proxy.yml up -d
+#
+# This connects mattermost to an external nginx-proxy network
+# and exposes it via VIRTUAL_HOST environment variable
+
+services:
+  mattermost:
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_PORT=8065
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - LETSENCRYPT_EMAIL=admin@ironcladtech.ca
+    expose:
+      - "8065"
+    networks:
+      - default
+      - nginx-proxy
+    # Calls port if needed
+    ports:
+      - ${CALLS_PORT}:${CALLS_PORT}/udp
+      - ${CALLS_PORT}:${CALLS_PORT}/tcp
+
+networks:
+  nginx-proxy:
+    external: true
