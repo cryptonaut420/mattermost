@@ -68,10 +68,10 @@ deploy_local() {
 deploy_server() {
     log_info "Deploying Mattermost with nginx-proxy..."
     
-    # Check if nginx-proxy network exists
-    if ! docker network ls | grep -q "nginx-proxy"; then
-        log_error "nginx-proxy network not found!"
-        log_error "Create it with: docker network create nginx-proxy"
+    # Check if tsqr-network exists (where nginx-proxy lives)
+    if ! docker network ls | grep -q "tsqr-network"; then
+        log_error "tsqr-network not found!"
+        log_error "Create it with: docker network create tsqr-network"
         log_error "Or ensure your nginx-proxy container is running."
         exit 1
     fi

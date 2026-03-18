@@ -15,12 +15,12 @@ services:
       - "8065"
     networks:
       - default
-      - nginx-proxy
+      - tsqr-network
     # Calls port if needed
     ports:
       - ${CALLS_PORT}:${CALLS_PORT}/udp
       - ${CALLS_PORT}:${CALLS_PORT}/tcp
 
 networks:
-  nginx-proxy:
+  tsqr-network:
     external: true
